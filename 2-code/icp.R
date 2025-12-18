@@ -6,10 +6,22 @@ options(scipen = 9999)
 
 sample_key = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/18yWE-YkqX01J-qg6sd-M40_6dwYPyZVb-1iFwEEy2cM/")
 analytes = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/")
-data = read.csv("1-data/62037_Patel_ICPMS_2025-12-17.csv")
+#data = read.csv("1-data/62037_Patel_ICPMS_2025-12-17.csv")
 
+ICP_FILEPATH = "1-data/data_raw/icpms"
 
 # -------------------------------------------------------------------------
+
+
+icp_data <- 
+  list.files(path=ICP_FILEPATH, pattern = ".csv", full.names = TRUE) %>% 
+  lapply(read_csv, id = "source") %>% 
+  bind_rows %>% 
+  mutate(source = basename(source)) %>% 
+  rename(X = `...2`)
+
+
+
 
 columns = 
   data %>% 
