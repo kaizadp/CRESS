@@ -62,7 +62,9 @@ processed_summary =
   all_reps %>% 
   group_by(soil_name, extraction, group, analyte) %>% 
   dplyr::summarise(ppb = mean(ppb_blank_corr),
-                   ppm = ppb/1000)
+                   ppb_se = sd(ppb_blank_corr)/sqrt(n()),
+                   ppm = ppb/1000) %>% 
+  mutate(across(where(is.numeric), round, 2))
 
 #
 ## by core, all reps ----
