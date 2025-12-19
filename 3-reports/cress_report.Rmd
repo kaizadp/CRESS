@@ -190,7 +190,10 @@ icp_processed %>%
 
 --- 
 
-## ICP-MS results --- mg/L
+<details>
+<summary> See raw extract concentrations here </summary>
+
+## ICP-MS results --- ug/L
 
 ```{r}
 
@@ -348,6 +351,12 @@ icp_processed %>%
 --- 
 
 </details>
+
+
+</details>
+
+
+
 
 ---
 

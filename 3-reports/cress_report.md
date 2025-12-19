@@ -40,7 +40,12 @@ See plots for all reps here
 
 ------------------------------------------------------------------------
 
-## ICP-MS results — mg/L
+<details>
+<summary>
+See raw extract concentrations here
+</summary>
+
+## ICP-MS results — ug/L
 
 ### DTPA extraction (single point extraction)
 
@@ -67,6 +72,7 @@ See plots for all reps here
 
 ------------------------------------------------------------------------
 
+</details>
 </details>
 
 ------------------------------------------------------------------------
