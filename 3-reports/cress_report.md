@@ -9,7 +9,7 @@ Extractions performed:
 
 ------------------------------------------------------------------------
 
-## ICP-MS results
+## ICP-MS results — mg/L
 
 ### DTPA extraction (single point extraction)
 
@@ -40,12 +40,43 @@ See plots for all reps here
 
 ------------------------------------------------------------------------
 
+## ICP-MS results — mg/L
+
+### DTPA extraction (single point extraction)
+
+![](cress_report_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
+
+### Sequential extraction (soil sequence)
+
+![](cress_report_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
+
+------------------------------------------------------------------------
+
+<details>
+<summary>
+See plots for all reps here
+</summary>
+
+### DTPA extraction (single point extraction)
+
+![](cress_report_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
+
+### Sequential extraction (soil sequence)
+
+![](cress_report_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->![](cress_report_files/figure-gfm/unnamed-chunk-11-3.png)<!-- -->
+
+------------------------------------------------------------------------
+
+</details>
+
+------------------------------------------------------------------------
+
 <details>
 <summary>
 Session Info
 </summary>
 
-Date run: 2025-12-18
+Date run: 2025-12-19
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20

@@ -1,4 +1,5 @@
 library(tidyverse)
+library(googlesheets4)
 theme_set(theme_bw())
 options(scipen = 9999)
 
@@ -6,7 +7,7 @@ options(scipen = 9999)
 
 sample_key = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/18yWE-YkqX01J-qg6sd-M40_6dwYPyZVb-1iFwEEy2cM/")
 analytes = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/")
-
+sample_weights = read_sheet("https://docs.google.com/spreadsheets/d/1HadvtmmzzITDaXQXLhnM7m2HURLJEilQTGbAC5LkAgc")
 ICP_FILEPATH = "1-data/data_raw/icpms"
 
 #
@@ -65,10 +66,19 @@ icp_processed =
   left_join(icp_blanks) %>% 
   mutate(ppb_blank_corr = ppb - blank_ppb,
          ppb_blank_corr = if_else(ppb_blank_corr < 0, 0, ppb_blank_corr)) %>% 
+  # standardize to soil weight
+  mutate(extraction_type = case_when(grepl("A:", extraction) ~ "DTPA",
+                                     grepl("B:|C:|D:|E:|F:", extraction) ~ "Soil sequence"),
+         volume_mL = case_when(extraction_type == "DTPA" ~ 10,
+                               extraction_type == "Soil sequence" ~ 40)) %>% 
+  left_join(sample_weights %>% dplyr::select(sample_ID, extraction_type, wt_g)) %>% 
+  mutate(ug_g = ppb * volume_mL / (wt_g * 1000),
+         mg_g = ug_g/1000) %>% 
   left_join(sample_key) %>% 
   left_join(analytes) %>% 
-  dplyr::select(-source) %>% 
-  dplyr::select(sample_ID, soil_name, replicate, analyte, group, everything())
+  dplyr::select(sample_ID, soil_name, replicate, analyte, group, extraction, ppb_blank_corr, ug_g, mg_g) %>% 
+  mutate(across(where(is.numeric), round, 2))
+
 
 #
 # ICP - EXPORT ------------------------------------------------------------

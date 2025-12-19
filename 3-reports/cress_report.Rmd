@@ -27,8 +27,170 @@ Extractions performed:
 
 ---
 
-
 ## ICP-MS results
+
+```{r}
+
+icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
+
+icp_summary = 
+  icp_processed %>% 
+  group_by(soil_name, extraction, group, analyte) %>% 
+  dplyr::summarise(ugg = mean(ug_g),
+                   ugg_se = sd(ug_g)/sqrt(n()),
+                   mgg = ugg/1000) %>% 
+  mutate(across(where(is.numeric), round, 2))
+
+```
+
+
+### DTPA extraction (single point extraction)
+
+```{r, fig.height=7, fig.width=10}
+
+icp_summary %>% 
+  filter(extraction == "A: DTPA" & 
+           group == "cations") %>% 
+  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction == "A: DTPA" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction == "A: DTPA" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+### Sequential extraction (soil sequence)
+
+```{r, fig.height=7, fig.width=10}
+icp_summary %>% 
+  filter(extraction != "A: DTPA" & 
+           group == "cations") %>% 
+  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction != "A: DTPA" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction != "A: DTPA" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+---
+
+<details>
+<summary> See plots for all reps here</summary>
+
+### DTPA extraction (single point extraction)
+
+```{r, fig.height=9, fig.width=15}
+
+icp_processed %>% 
+  filter(extraction == "A: DTPA" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_processed %>% 
+  filter(extraction == "A: DTPA" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_processed %>% 
+  filter(extraction == "A: DTPA" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+### Sequential extraction (soil sequence)
+
+```{r, fig.height=9, fig.width=15}
+icp_processed %>% 
+  filter(extraction != "A: DTPA" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_processed %>% 
+  filter(extraction != "A: DTPA" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_processed %>% 
+  filter(extraction != "A: DTPA" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+--- 
+
+</details>
+
+
+
+--- 
+
+## ICP-MS results --- mg/L
 
 ```{r}
 
@@ -123,7 +285,7 @@ icp_summary %>%
 icp_processed %>% 
   filter(extraction == "A: DTPA" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_ID, y = ppb/1000, fill = extraction))+
+  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations")+
   facet_wrap(~analyte, scales = "free_y")+
@@ -132,7 +294,7 @@ icp_processed %>%
 icp_processed %>% 
   filter(extraction == "A: DTPA" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_ID, y = ppb/1000, fill = extraction))+
+  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals")+
   facet_wrap(~analyte, scales = "free_y")+
@@ -141,7 +303,7 @@ icp_processed %>%
 icp_processed %>% 
   filter(extraction == "A: DTPA" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_ID, y = ppb, fill = extraction))+
+  ggplot(aes(x = sample_ID, y = ppb_blank_corr, fill = extraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs")+
   facet_wrap(~analyte, scales = "free_y")+
@@ -156,7 +318,7 @@ icp_processed %>%
 icp_processed %>% 
   filter(extraction != "A: DTPA" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_ID, y = ppb/1000, fill = extraction))+
+  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations")+
   facet_wrap(~analyte, scales = "free_y")+
@@ -165,7 +327,7 @@ icp_processed %>%
 icp_processed %>% 
   filter(extraction != "A: DTPA" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_ID, y = ppb/1000, fill = extraction))+
+  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals")+
   facet_wrap(~analyte, scales = "free_y")+
@@ -174,7 +336,7 @@ icp_processed %>%
 icp_processed %>% 
   filter(extraction != "A: DTPA" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_ID, y = ppb, fill = extraction))+
+  ggplot(aes(x = sample_ID, y = ppb_blank_corr, fill = extraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs")+
   facet_wrap(~analyte, scales = "free_y")+
