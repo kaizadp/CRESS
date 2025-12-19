@@ -53,7 +53,8 @@ icp_summary %>%
            group == "cations") %>% 
   ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
   geom_bar(stat = "identity")+
-  labs(title = "cations")+
+  labs(title = "cations",
+       y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -62,7 +63,8 @@ icp_summary %>%
            group == "CMMs and metals") %>% 
   ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
   geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
+  labs(title = "CMMs and metals",
+              y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -71,7 +73,8 @@ icp_summary %>%
            group == "REEs") %>% 
   ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
   geom_bar(stat = "identity")+
-  labs(title = "REEs")+
+  labs(title = "REEs",
+              y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -86,7 +89,8 @@ icp_summary %>%
            group == "cations") %>% 
   ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
   geom_bar(stat = "identity")+
-  labs(title = "cations")+
+  labs(title = "cations",
+              y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -95,7 +99,8 @@ icp_summary %>%
            group == "CMMs and metals") %>% 
   ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
   geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
+  labs(title = "CMMs and metals",
+       y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -104,7 +109,8 @@ icp_summary %>%
            group == "REEs") %>% 
   ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
   geom_bar(stat = "identity")+
-  labs(title = "REEs")+
+  labs(title = "REEs",
+       y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
