@@ -9,7 +9,7 @@ Extractions performed:
 
 ------------------------------------------------------------------------
 
-## ICP-MS results — mg/L
+## ICP-MS results
 
 ### DTPA extraction (single point extraction)
 
