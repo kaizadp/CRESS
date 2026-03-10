@@ -11,11 +11,15 @@ knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE)
 ```
 
-```{r}
+```{r packages}
 
 library(tidyverse)
 theme_set(theme_bw())
 options(scipen = 9999)
+
+pal_soil_sequence = whistledown::whistledown_palette("kathani", 4)
+pal_amd_sequence = whistledown::whistledown_palette("featherington", 6)
+pal_tessier_sequence = whistledown::whistledown_palette("queen", 5)
 
 ```
 
@@ -29,13 +33,13 @@ Extractions performed:
 
 ## ICP-MS results
 
-```{r}
+```{r icp_files}
 
 icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
 
 icp_summary = 
   icp_processed %>% 
-  group_by(soil_name, extraction, group, analyte) %>% 
+  group_by(sample_name, extraction_sequence, fraction, group, analyte) %>% 
   dplyr::summarise(ugg = mean(ug_g),
                    ugg_se = sd(ug_g)/sqrt(n()),
                    mgg = ugg/1000) %>% 
@@ -46,12 +50,12 @@ icp_summary =
 
 ### DTPA extraction (single point extraction)
 
-```{r, fig.height=7, fig.width=10}
+```{r dtpa, fig.height=7, fig.width=10}
 
 icp_summary %>% 
-  filter(extraction == "A: DTPA" & 
+  filter(fraction == "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
        y = "analyte concentration (μg/g soil)")+
@@ -59,9 +63,9 @@ icp_summary %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 icp_summary %>% 
-  filter(extraction == "A: DTPA" & 
+  filter(fraction == "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
               y = "analyte concentration (μg/g soil)")+
@@ -69,9 +73,9 @@ icp_summary %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 icp_summary %>% 
-  filter(extraction == "A: DTPA" & 
+  filter(fraction == "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
               y = "analyte concentration (μg/g soil)")+
@@ -83,296 +87,127 @@ icp_summary %>%
 
 ### Sequential extraction (soil sequence)
 
-```{r, fig.height=7, fig.width=10}
+```{r soil_sequence, fig.height=7, fig.width=10}
 icp_summary %>% 
-  filter(extraction != "A: DTPA" & 
+  filter(extraction_sequence == "Soil Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
               y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    scale_fill_manual(values = pal_soil_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 icp_summary %>% 
-  filter(extraction != "A: DTPA" & 
+    filter(extraction_sequence == "Soil Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      scale_fill_manual(values = pal_soil_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 icp_summary %>% 
-  filter(extraction != "A: DTPA" & 
+    filter(extraction_sequence == "Soil Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = soil_name, y = ugg, fill = extraction))+
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "analyte concentration (μg/g soil)")+
   facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      scale_fill_manual(values = pal_soil_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (AMD sequence)
+
+```{r amd_sequence, fig.height=7, fig.width=10}
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations",
+              y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+      scale_fill_manual(values = pal_amd_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+    filter(extraction_sequence == "AMD Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals",
+       y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+        scale_fill_manual(values = pal_amd_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs",
+       y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+        scale_fill_manual(values = pal_amd_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (Tessier sequence)
+
+```{r tessier_sequence, fig.height=7, fig.width=10}
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations",
+              y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+        scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+    filter(extraction_sequence == "Tessier Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals",
+       y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+          scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs",
+       y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+          scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
 ---
-
-<details>
-<summary> See plots for all reps here</summary>
-
-### DTPA extraction (single point extraction)
-
-```{r, fig.height=9, fig.width=15}
-
-icp_processed %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "cations") %>% 
-  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "cations")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "REEs") %>% 
-  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "REEs")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-```
-
-### Sequential extraction (soil sequence)
-
-```{r, fig.height=9, fig.width=15}
-icp_processed %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "cations") %>% 
-  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "cations")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "REEs") %>% 
-  ggplot(aes(x = sample_ID, y = ug_g, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "REEs")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
-
---- 
-
-</details>
-
-
-
---- 
-
-<details>
-<summary> See raw extract concentrations here </summary>
-
-## ICP-MS results --- ug/L
-
-```{r}
-
-icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
-
-icp_summary = 
-  icp_processed %>% 
-  group_by(soil_name, extraction, group, analyte) %>% 
-  dplyr::summarise(ppb = mean(ppb_blank_corr),
-                   ppb_se = sd(ppb_blank_corr)/sqrt(n()),
-                   ppm = ppb/1000) %>% 
-  mutate(across(where(is.numeric), round, 2))
-
-```
-
-
-### DTPA extraction (single point extraction)
-
-```{r, fig.height=7, fig.width=10}
-
-icp_summary %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "cations") %>% 
-  ggplot(aes(x = soil_name, y = ppb/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "cations")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_summary %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "CMMs and metals") %>% 
-  ggplot(aes(x = soil_name, y = ppb/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_summary %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "REEs") %>% 
-  ggplot(aes(x = soil_name, y = ppb, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "REEs")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-```
-
-### Sequential extraction (soil sequence)
-
-```{r, fig.height=7, fig.width=10}
-icp_summary %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "cations") %>% 
-  ggplot(aes(x = soil_name, y = ppb/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "cations")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_summary %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "CMMs and metals") %>% 
-  ggplot(aes(x = soil_name, y = ppb/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_summary %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "REEs") %>% 
-  ggplot(aes(x = soil_name, y = ppb, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "REEs")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
----
-
-<details>
-<summary> See plots for all reps here</summary>
-
-### DTPA extraction (single point extraction)
-
-```{r, fig.height=9, fig.width=15}
-
-icp_processed %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "cations") %>% 
-  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "cations")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction == "A: DTPA" & 
-           group == "REEs") %>% 
-  ggplot(aes(x = sample_ID, y = ppb_blank_corr, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "REEs")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-```
-
-### Sequential extraction (soil sequence)
-
-```{r, fig.height=9, fig.width=15}
-icp_processed %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "cations") %>% 
-  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "cations")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_ID, y = ppb_blank_corr/1000, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "CMMs and metals")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-icp_processed %>% 
-  filter(extraction != "A: DTPA" & 
-           group == "REEs") %>% 
-  ggplot(aes(x = sample_ID, y = ppb_blank_corr, fill = extraction))+
-  geom_bar(stat = "identity")+
-  labs(title = "REEs")+
-  facet_wrap(~analyte, scales = "free_y")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
-
---- 
-
-</details>
-
-
-</details>
-
-
-
-
----
-
-<details>
-<summary> Session Info </summary>
-
-Date run: `r Sys.Date()`
-
-```{r}
-sessionInfo()
-```
-
-</details>
