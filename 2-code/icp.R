@@ -36,40 +36,38 @@ icp_data <-
 
 icp_columns = 
   icp_data %>% 
-  mutate_at(vars(-c(X, source)), as.numeric) %>% 
   pivot_longer(cols = -c(X, source), values_to = "ppb", names_to = "analyte") %>% 
-  mutate(#X = str_replace(X, "CRESS_[0-9]{3}_", "CRESS_[0-9]{3}"),
-         sample_ID = str_extract(X, "CRESS_[0-9]{3}"),
+  filter(grepl("CRESS", X, ignore.case = T)) %>% 
+  drop_na() %>% 
+  mutate(sample_ID = str_extract(X, "CRESS_[0-9]{3}"),
          extract_code = str_extract(X, "CRESS_[0-9]{3}[A-Z]"),
          extract_code = str_remove(extract_code, "CRESS_[0-9]{3}")) %>% 
- # mutate(extraction = case_match(extraction, 
- #                                "A" ~ "A: DTPA",
- #                                "B" ~ "B: Water",
- #                                "C" ~ "C: HCl",
- #                                "D" ~ "D: Dithionite",
- #                                "E" ~ "E: Pyrophosphate")) %>% 
-  mutate(ppb = if_else(ppb < 0, 0, ppb)) %>% 
-  mutate(ppb = if_else(ppb < 0, 0, ppb)) 
+  mutate(ppb = as.numeric(ppb),
+         ppb = if_else(ppb < 0, 0, ppb),
+         ppb = replace_na(ppb, 0))
+
+## DIGESTS
+icp_digests = 
+  icp_columns %>% 
+  filter(grepl("Digest", source)) %>% 
+  filter(grepl("CRESS", X, ignore.case = T)) %>% 
+  rename(CRESS_ID = X) %>% 
+  dplyr::select(-c(sample_ID, extract_code, source)) %>% 
+  group_by(CRESS_ID, analyte) %>% 
+  dplyr::summarise(ppb = mean(ppb)) %>% 
+  mutate(ug_g = ppb * 25 / (0.1 * 1000), #25 mL, 0.1 g
+         mg_g = ug_g/1000)
 
 
+## EXTRACTS
 icp_blanks = 
   icp_columns %>% 
   filter(grepl("Extracts", source)) %>% 
   filter(grepl("blank", X, ignore.case = T)) %>% 
-#  separate(X, sep = " Blank ", into = c("a", "extraction")) %>% 
   dplyr::select(source, X, analyte, ppb) %>%
   mutate(extract_code = str_extract(X, "Blank_[A-Z]"),
          extract_code = str_remove(extract_code, "Blank_")) %>% 
-#  mutate(extraction = str_remove_all(extraction, " "),
-#         extraction = case_match(extraction, 
-#                                 "DTPA" ~ "A: DTPA",
-#                                 "Water" ~ "B: Water",
-#                                 "HCl" ~ "C: HCl",
-#                                 "Dithionite" ~ "D: Dithionite",
-#                                 "Pyrophosphate" ~ "E: Pyrophosphate")) %>% 
-#  mutate(ppb = if_else(ppb < 0, 0, ppb)) %>% 
   rename(blank_ppb = ppb) %>% 
-  replace(is.na(.), 0) %>% 
   dplyr::select(source, analyte, extract_code, blank_ppb)
 
 icp_samples = 
@@ -77,29 +75,44 @@ icp_samples =
   filter(grepl("Extracts", source)) %>% 
   filter(!grepl("blank", X, ignore.case = T)) %>% 
   filter(!is.na(sample_ID)) %>% 
-  dplyr::select(source, analyte, sample_ID, extract_code, ppb)
-  
+  dplyr::select(source, analyte, sample_ID, extract_code, ppb) %>% 
+  left_join(icp_blanks) %>% 
+  mutate(ppb_blank_corr = ppb - blank_ppb,
+         ppb_blank_corr = if_else(ppb_blank_corr < 0, 0, ppb_blank_corr)) %>% 
+  left_join(extraction_key_extracts) %>% 
+  mutate(ug_g = ppb * volume_mL / (wt_g * 1000)) %>% 
+  mutate(across(where(is.numeric), round, 2)) %>% 
+  left_join(extraction_key_soils) %>% 
+#  left_join(analytes) %>% 
+#  dplyr::select(sample_ID, sample_name, analyte, group, extraction_sequence, extract_code,  extract, fraction, ppb_blank_corr, ug_g, mg_g) %>% 
+#  mutate(across(where(is.numeric), round, 2)) %>% 
+  left_join(soil_key_digestions) %>% 
+  dplyr::select(sample_ID, sample_name, CRESS_ID, analyte, extraction_sequence, extract_code, extract, fraction , ug_g)
+
+## calculate residual fraction by substracting the total of EXTRACTS from the DIGESTS
+icp_residual = 
+  icp_samples %>% 
+#  filter(grepl("Sequence", extraction_sequence)) %>% 
+  group_by(sample_ID, sample_name, CRESS_ID, analyte, extraction_sequence) %>% 
+  dplyr::summarise(sum_ugg = sum(ug_g)) %>% 
+  mutate(
+    fraction = "R: residual",
+         extract = "R: residual",
+         extract_code = "R") %>% 
+  left_join(icp_digests %>% dplyr::select(CRESS_ID, analyte, ug_g) %>% rename(digest_ugg = ug_g)) %>% 
+  mutate(ug_g = digest_ugg - sum_ugg,
+         ug_g = case_when(ug_g < 0 ~ 0, .default = ug_g)) %>%  
+  dplyr::select(-c(sum_ugg, digest_ugg))
+
 
 icp_processed = 
   icp_samples %>% 
-  replace(is.na(.), 0) %>% 
-  left_join(icp_blanks) %>% 
-  mutate(ppb_blank_corr = ppb - blank_ppb,
-         ppb_blank_corr = if_else(ppb_blank_corr < 0, 0, ppb_blank_corr)) %>%
-  left_join(extraction_key_extracts) %>% 
-      #   
-      #  # standardize to soil weight 
-      #  mutate(extraction_type = case_when(grepl("A:", extraction) ~ "DTPA", 
-      #                                     grepl("B:|C:|D:|E:|F:", extraction) ~ "Soil sequence"), 
-      #         volume_mL = case_when(extraction_type == "DTPA" ~ 10, 
-      #                               extraction_type == "Soil sequence" ~ 40)) %>%   
-      #  left_join(sample_weights %>% dplyr::select(sample_ID, extraction_type, wt_g)) %>% 
-  mutate(ug_g = ppb * volume_mL / (wt_g * 1000),
-         mg_g = ug_g/1000) %>% 
-  left_join(extraction_key_soils) %>% 
-  left_join(analytes) %>% 
-  dplyr::select(sample_ID, sample_name, analyte, group, extraction_sequence, extract_code,  extract, fraction, ppb_blank_corr, ug_g, mg_g) %>% 
-  mutate(across(where(is.numeric), round, 2))
+  bind_rows(icp_residual) %>% 
+  mutate(mg_g = ug_g/1000) %>% 
+  group_by(sample_ID, extraction_sequence, analyte) %>% 
+  dplyr::mutate(total_ugg = sum(ug_g),
+                percent = 100 * ug_g/total_ugg) %>% 
+  left_join(analytes)
 
 
 #
