@@ -9,7 +9,7 @@ Extractions performed:
 
 ------------------------------------------------------------------------
 
-## ICP-MS results
+## ICP-MS results – ug/g
 
 ### DTPA extraction (single point extraction)
 
@@ -26,5 +26,23 @@ Extractions performed:
 ### Sequential extraction (Tessier sequence)
 
 ![](cress_report_files/figure-gfm/tessier_sequence-1.png)<!-- -->![](cress_report_files/figure-gfm/tessier_sequence-2.png)<!-- -->![](cress_report_files/figure-gfm/tessier_sequence-3.png)<!-- -->
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## ICP-MS results – percentage
+
+### Sequential extraction (soil sequence)
+
+![](cress_report_files/figure-gfm/percent_soil_sequence-1.png)<!-- -->![](cress_report_files/figure-gfm/percent_soil_sequence-2.png)<!-- -->![](cress_report_files/figure-gfm/percent_soil_sequence-3.png)<!-- -->
+
+### Sequential extraction (AMD sequence)
+
+![](cress_report_files/figure-gfm/percent_amd_sequence-1.png)<!-- -->![](cress_report_files/figure-gfm/percent_amd_sequence-2.png)<!-- -->![](cress_report_files/figure-gfm/percent_amd_sequence-3.png)<!-- -->
+
+### Sequential extraction (Tessier sequence)
+
+![](cress_report_files/figure-gfm/percent_tessier_sequence-1.png)<!-- -->![](cress_report_files/figure-gfm/percent_tessier_sequence-2.png)<!-- -->![](cress_report_files/figure-gfm/percent_tessier_sequence-3.png)<!-- -->
 
 ------------------------------------------------------------------------

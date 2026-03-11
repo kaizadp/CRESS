@@ -17,9 +17,9 @@ library(tidyverse)
 theme_set(theme_bw())
 options(scipen = 9999)
 
-pal_soil_sequence = whistledown::whistledown_palette("kathani", 4)
-pal_amd_sequence = whistledown::whistledown_palette("featherington", 6)
-pal_tessier_sequence = whistledown::whistledown_palette("queen", 5)
+pal_soil_sequence = whistledown::whistledown_palette("kathani", 5)
+pal_amd_sequence = whistledown::whistledown_palette("featherington", 7)
+pal_tessier_sequence = whistledown::whistledown_palette("queen", 6)
 
 ```
 
@@ -31,7 +31,7 @@ Extractions performed:
 
 ---
 
-## ICP-MS results
+## ICP-MS results -- ug/g
 
 ```{r icp_files}
 
@@ -42,7 +42,8 @@ icp_summary =
   group_by(sample_name, extraction_sequence, fraction, group, analyte) %>% 
   dplyr::summarise(ugg = mean(ug_g),
                    ugg_se = sd(ug_g)/sqrt(n()),
-                   mgg = ugg/1000) %>% 
+                   mgg = ugg/1000,
+                   percent = mean(percent)) %>% 
   mutate(across(where(is.numeric), round, 2))
 
 ```
@@ -204,6 +205,138 @@ icp_summary %>%
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y")+
+          scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+---
+
+
+---
+
+## ICP-MS results -- percentage
+
+### Sequential extraction (soil sequence)
+
+```{r percent_soil_sequence, fig.height=7, fig.width=10}
+icp_summary %>% 
+  filter(extraction_sequence == "Soil Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+    scale_fill_manual(values = pal_soil_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+    filter(extraction_sequence == "Soil Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+      scale_fill_manual(values = pal_soil_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+    filter(extraction_sequence == "Soil Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+      scale_fill_manual(values = pal_soil_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (AMD sequence)
+
+```{r percent_amd_sequence, fig.height=7, fig.width=10}
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+      scale_fill_manual(values = pal_amd_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+    filter(extraction_sequence == "AMD Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+        scale_fill_manual(values = pal_amd_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+        scale_fill_manual(values = pal_amd_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (Tessier sequence)
+
+```{r percent_tessier_sequence, fig.height=7, fig.width=10}
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "cations") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "cations",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+        scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+    filter(extraction_sequence == "Tessier Sequence") %>% 
+filter(fraction != "A: DTPA-available" & 
+           group == "CMMs and metals") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals",
+       y = "percentage")+
+  facet_wrap(~analyte, scales = "free_y")+
+          scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+  filter(fraction != "A: DTPA-available" & 
+           group == "REEs") %>% 
+  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs",
+       y = "percentage")+
   facet_wrap(~analyte, scales = "free_y")+
           scale_fill_manual(values = pal_tessier_sequence)+ 
 theme(axis.text.x = element_text(angle = 45, hjust = 1))
