@@ -9,11 +9,17 @@ output:
 knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE,
                       warning = FALSE)
+
+options(knitr.kable.NA = "")
+
 ```
 
 ```{r packages}
 
 library(tidyverse)
+library(googlesheets4)
+library(whistledown)
+
 theme_set(theme_bw())
 options(scipen = 9999)
 
@@ -23,11 +29,51 @@ pal_tessier_sequence = whistledown::whistledown_palette("queen", 6)
 
 ```
 
+```{r load_files}
 
-Extractions performed:
+icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
+icp_digests = read.csv("1-data/data_processed/ICP_processed_digests.csv")
+xrf_processed = read.csv("1-data/data_processed/XRF_processed.csv")
+
+analytes_list = read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/edit?gid=0#gid=0")
+
+```
+
+
+--- 
+
+# Experimental design
+
+<details>
+<summary> Click to open </summary>
+
+## Which analytes were measured?
+
+```{r}
+
+analytes_list %>%  
+  knitr::kable()
+
+```
+
+--- 
+
+
+## Extractions performed:
 
 - Single-point DTPA extraction
 - "Soil sequence" sequential extraction: water --> HCl --> sodium dithionite --> sodium pyrophosphate
+- "AMD sequence" (Acid Mine Drainage) sequential extraction
+- "Tessier sequence" sequential extraction
+
+Microwave digestions were performed to quantify total concentrations in the samples. 
+The "residual fraction" was calculated by subtracting total extractable values (from the sequences) from the digest concentrations.
+
+
+
+</details>
+
+
 
 ---
 
@@ -35,11 +81,9 @@ Extractions performed:
 
 ```{r icp_files}
 
-icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
-
 icp_summary = 
   icp_processed %>% 
-  group_by(sample_name, extraction_sequence, fraction, group, analyte) %>% 
+  group_by(CRESS_ID, sample_name, extraction_sequence, fraction, group, analyte) %>% 
   dplyr::summarise(ugg = mean(ug_g),
                    ugg_se = sd(ug_g)/sqrt(n()),
                    mgg = ugg/1000,
@@ -56,7 +100,7 @@ icp_summary =
 icp_summary %>% 
   filter(fraction == "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
        y = "analyte concentration (μg/g soil)")+
@@ -66,7 +110,7 @@ icp_summary %>%
 icp_summary %>% 
   filter(fraction == "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
               y = "analyte concentration (μg/g soil)")+
@@ -76,7 +120,7 @@ icp_summary %>%
 icp_summary %>% 
   filter(fraction == "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
               y = "analyte concentration (μg/g soil)")+
@@ -93,7 +137,7 @@ icp_summary %>%
   filter(extraction_sequence == "Soil Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
               y = "analyte concentration (μg/g soil)")+
@@ -105,7 +149,7 @@ icp_summary %>%
     filter(extraction_sequence == "Soil Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "analyte concentration (μg/g soil)")+
@@ -117,7 +161,7 @@ icp_summary %>%
     filter(extraction_sequence == "Soil Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "analyte concentration (μg/g soil)")+
@@ -135,7 +179,7 @@ icp_summary %>%
   filter(extraction_sequence == "AMD Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
               y = "analyte concentration (μg/g soil)")+
@@ -147,7 +191,7 @@ icp_summary %>%
     filter(extraction_sequence == "AMD Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "analyte concentration (μg/g soil)")+
@@ -159,7 +203,7 @@ icp_summary %>%
   filter(extraction_sequence == "AMD Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "analyte concentration (μg/g soil)")+
@@ -177,7 +221,7 @@ icp_summary %>%
   filter(extraction_sequence == "Tessier Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
               y = "analyte concentration (μg/g soil)")+
@@ -189,7 +233,7 @@ icp_summary %>%
     filter(extraction_sequence == "Tessier Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "analyte concentration (μg/g soil)")+
@@ -201,7 +245,7 @@ icp_summary %>%
   filter(extraction_sequence == "Tessier Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = ugg, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "analyte concentration (μg/g soil)")+
@@ -225,7 +269,7 @@ icp_summary %>%
   filter(extraction_sequence == "Soil Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
        y = "percentage")+
@@ -237,7 +281,7 @@ icp_summary %>%
     filter(extraction_sequence == "Soil Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "percentage")+
@@ -249,7 +293,7 @@ icp_summary %>%
     filter(extraction_sequence == "Soil Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "percentage")+
@@ -267,7 +311,7 @@ icp_summary %>%
   filter(extraction_sequence == "AMD Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
        y = "percentage")+
@@ -279,7 +323,7 @@ icp_summary %>%
     filter(extraction_sequence == "AMD Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "percentage")+
@@ -291,7 +335,7 @@ icp_summary %>%
   filter(extraction_sequence == "AMD Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "percentage")+
@@ -309,7 +353,7 @@ icp_summary %>%
   filter(extraction_sequence == "Tessier Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "cations") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "cations",
        y = "percentage")+
@@ -321,7 +365,7 @@ icp_summary %>%
     filter(extraction_sequence == "Tessier Sequence") %>% 
 filter(fraction != "A: DTPA-available" & 
            group == "CMMs and metals") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "CMMs and metals",
        y = "percentage")+
@@ -333,7 +377,7 @@ icp_summary %>%
   filter(extraction_sequence == "Tessier Sequence") %>% 
   filter(fraction != "A: DTPA-available" & 
            group == "REEs") %>% 
-  ggplot(aes(x = sample_name, y = percent, fill = fraction))+
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
   geom_bar(stat = "identity")+
   labs(title = "REEs",
        y = "percentage")+
@@ -344,3 +388,24 @@ theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ---
+
+# XRF analysis
+
+```{r fig.height=10, fig.width=14}
+
+xrf_digest_compar = 
+  xrf_processed %>% 
+  full_join(icp_digests %>% dplyr::select(CRESS_ID, analyte, ug_g)) %>% 
+  rename(digest_ugg = ug_g) %>% 
+  arrange(analyte) %>% 
+#  pivot_longer(cols = -c(CRESS_ID, analyte)) %>% 
+  force()
+
+xrf_digest_compar %>% 
+  drop_na() %>% 
+  ggplot(aes(x = XRF_ugg, y = digest_ugg, color = CRESS_ID))+
+  geom_point()+
+  facet_wrap(~analyte, scales = "free")
+
+```
+
