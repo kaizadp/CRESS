@@ -1,3 +1,9 @@
+library(tidyverse)
+library(googlesheets4)
+theme_set(theme_bw())
+options(scipen = 9999)
+
+# -------------------------------------------------------------------------
 
 xrf_data = read.csv("1-data/data_raw/XRF/XRF.csv", skip = 1)
 
@@ -8,15 +14,5 @@ xrf_long =
   mutate(XRF_ugg = as.numeric(XRF_ugg),
          XRF_ugg = replace_na(XRF_ugg, 0))
 
-
-xrf_digest_compar = 
-  xrf_long %>% 
-  left_join(icp_digests %>% dplyr::select(CRESS_ID, analyte, ug_g)) %>% 
-  rename(digest_ugg = ug_g) %>% 
-#  pivot_longer(cols = -c(CRESS_ID, analyte)) %>% 
-  force()
-
-xrf_digest_compar %>% 
-  ggplot(aes(x = XRF_ugg, y = digest_ugg, color = CRESS_ID))+
-  geom_point()+
-  facet_wrap(~analyte, scales = "free")
+xrf_long %>% 
+  write.csv("1-data/data_processed/XRF_processed.csv", row.names = F, na = "")
