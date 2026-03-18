@@ -55,8 +55,10 @@ icp_digests =
   dplyr::select(-c(sample_ID, extract_code, source)) %>% 
   group_by(CRESS_ID, analyte) %>% 
   dplyr::summarise(ppb = mean(ppb)) %>% 
+  ungroup() %>% 
   mutate(ug_g = ppb * 25 / (0.1 * 1000), #25 mL, 0.1 g
-         mg_g = ug_g/1000)
+         mg_g = ug_g/1000) %>% 
+  mutate(across(where(is.numeric), round, 2))
 
 
 ## EXTRACTS
@@ -121,5 +123,6 @@ icp_processed =
 icp_processed %>% 
   write.csv("1-data/data_processed/ICP_processed.csv", row.names = F, na = "")
 
-
-
+icp_digests %>% 
+  dplyr::select(-ppb) %>% 
+  write.csv("1-data/data_processed/ICP_processed_digests.csv", row.names = F, na = "")
