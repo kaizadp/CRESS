@@ -14,52 +14,52 @@ Click to open
 
 | analyte | group           | XRF | ICP |
 |:--------|:----------------|:----|:----|
-| Ag      |                 | Y   |     |
 | Al      | cations         |     | Y   |
-| As      | CMMs and metals | Y   |     |
-| Ba      | CMMs and metals |     | Y   |
-| Br      | Halogen         | Y   |     |
 | Ca      | cations         |     | Y   |
+| K       | cations         |     | Y   |
+| Mg      | cations         |     | Y   |
+| Ag      | CMMs and metals | Y   |     |
+| As      | CMMs and metals | Y   |     |
+| Ba      | CMMs and metals | Y   | Y   |
 | Cd      | CMMs and metals | Y   |     |
-| Ce      | REEs            |     | Y   |
-| Cl      | Halogen         | Y   |     |
 | Co      | CMMs and metals |     | Y   |
-| Cr      | CMMs and metals |     | Y   |
+| Cr      | CMMs and metals | Y   | Y   |
 | Cs      | CMMs and metals | Y   |     |
-| Cu      | CMMs and metals |     | Y   |
+| Cu      | CMMs and metals | Y   | Y   |
+| Fe      | CMMs and metals |     | Y   |
+| Ga      | CMMs and metals | Y   |     |
+| In      | CMMs and metals | Y   |     |
+| Li      | CMMs and metals |     | Y   |
+| Mn      | CMMs and metals |     | Y   |
+| Mo      | CMMs and metals | Y   | Y   |
+| Nb      | CMMs and metals | Y   |     |
+| Ni      | CMMs and metals | Y   | Y   |
+| Pb      | CMMs and metals | Y   |     |
+| Rb      | CMMs and metals | Y   |     |
+| Sb      | CMMs and metals | Y   |     |
+| Se      | CMMs and metals | Y   |     |
+| Si      | CMMs and metals |     | Y   |
+| Sr      | CMMs and metals | Y   | Y   |
+| V       | CMMs and metals | Y   |     |
+| Zn      | CMMs and metals | Y   | Y   |
+| Br      | Halogen         | Y   |     |
+| Cl      | Halogen         | Y   |     |
+| Ce      | REEs            | Y   | Y   |
 | Dy      | REEs            |     | Y   |
 | Er      | REEs            |     | Y   |
 | Eu      | REEs            |     | Y   |
-| Fe      | CMMs and metals |     | Y   |
-| Ga      | CMMs and metals | Y   |     |
 | Gd      | REEs            |     | Y   |
 | Ho      | REEs            |     | Y   |
-| In      | CMMs and metals | Y   |     |
-| K       | cations         |     | Y   |
 | La      | REEs            |     | Y   |
-| Li      | CMMs and metals |     | Y   |
 | Lu      | REEs            |     | Y   |
-| Mg      | cations         |     | Y   |
-| Mn      | CMMs and metals |     | Y   |
-| Mo      | CMMs and metals |     | Y   |
-| Nb      | CMMs and metals | Y   |     |
 | Nd      | REEs            |     | Y   |
-| Ni      | CMMs and metals |     | Y   |
-| Pb      | CMMs and metals | Y   |     |
 | Pr      | REEs            |     | Y   |
-| Rb      | CMMs and metals | Y   |     |
-| Sb      | CMMs and metals | Y   |     |
 | Sc      | REEs            |     | Y   |
-| Se      | CMMs and metals | Y   |     |
-| Si      | CMMs and metals |     | Y   |
 | Sm      | REEs            |     | Y   |
-| Sr      | CMMs and metals |     | Y   |
 | Tb      | REEs            |     | Y   |
 | Tm      | REEs            |     | Y   |
-| V       | CMMs and metals | Y   |     |
-| Y       | REEs            |     | Y   |
+| Y       | REEs            | Y   | Y   |
 | Yb      | REEs            |     | Y   |
-| Zn      | CMMs and metals |     | Y   |
 
 ------------------------------------------------------------------------
 
