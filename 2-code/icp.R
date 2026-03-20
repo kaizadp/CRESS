@@ -14,7 +14,8 @@ extraction_key_extracts = googlesheets4::read_sheet("https://docs.google.com/spr
                                                     sheet = "EXTRACTION_KEY_EXTRACTS")
 soil_key_digestions = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/18yWE-YkqX01J-qg6sd-M40_6dwYPyZVb-1iFwEEy2cM/",
                                                 sheet = "SOIL_KEY_DIGESTIONS")
-
+extraction_weights = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1HadvtmmzzITDaXQXLhnM7m2HURLJEilQTGbAC5LkAgc/edit?gid=1627643595#gid=1627643595",
+                                               sheet = "extraction_weights_cleaned")
 analytes = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/")
 ICP_FILEPATH = "1-data/data_raw/icpms"
 
@@ -37,7 +38,7 @@ icp_data <-
 icp_columns = 
   icp_data %>% 
   pivot_longer(cols = -c(X, source), values_to = "ppb", names_to = "analyte") %>% 
-  filter(grepl("CRESS", X, ignore.case = T)) %>% 
+ # filter(grepl("CRESS", X, ignore.case = T)) %>% 
   drop_na() %>% 
   mutate(sample_ID = str_extract(X, "CRESS_[0-9]{3}"),
          extract_code = str_extract(X, "CRESS_[0-9]{3}[A-Z]"),
@@ -74,6 +75,7 @@ icp_blanks =
 
 icp_samples = 
   icp_columns %>% 
+  filter(grepl("CRESS", X, ignore.case = T)) %>% 
   filter(grepl("Extracts", source)) %>% 
   filter(!grepl("blank", X, ignore.case = T)) %>% 
   filter(!is.na(sample_ID)) %>% 
@@ -81,7 +83,8 @@ icp_samples =
   left_join(icp_blanks) %>% 
   mutate(ppb_blank_corr = ppb - blank_ppb,
          ppb_blank_corr = if_else(ppb_blank_corr < 0, 0, ppb_blank_corr)) %>% 
-  left_join(extraction_key_extracts) %>% 
+  left_join(extraction_weights) %>% 
+  left_join(extraction_key_extracts %>% dplyr::select(-wt_g, -volume_mL)) %>% 
   mutate(ug_g = ppb * volume_mL / (wt_g * 1000)) %>% 
   mutate(across(where(is.numeric), round, 2)) %>% 
   left_join(extraction_key_soils) %>% 
@@ -94,6 +97,7 @@ icp_samples =
 ## calculate residual fraction by substracting the total of EXTRACTS from the DIGESTS
 icp_residual = 
   icp_samples %>% 
+  ungroup() %>% 
 #  filter(grepl("Sequence", extraction_sequence)) %>% 
   group_by(sample_ID, sample_name, CRESS_ID, analyte, extraction_sequence) %>% 
   dplyr::summarise(sum_ugg = sum(ug_g)) %>% 
@@ -103,7 +107,8 @@ icp_residual =
          extract_code = "R") %>% 
   left_join(icp_digests %>% dplyr::select(CRESS_ID, analyte, ug_g) %>% rename(digest_ugg = ug_g)) %>% 
   mutate(ug_g = digest_ugg - sum_ugg,
-         ug_g = case_when(ug_g < 0 ~ 0, .default = ug_g)) %>%  
+         ug_g = case_when(ug_g < 0 ~ 0, .default = ug_g),
+         flag_digest = case_when(ug_g == 0 ~ "low values in digest")) %>%  
   dplyr::select(-c(sum_ugg, digest_ugg))
 
 
