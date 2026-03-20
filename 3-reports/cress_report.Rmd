@@ -409,3 +409,56 @@ xrf_digest_compar %>%
 
 ```
 
+
+
+---
+
+```{r}
+library(ggh4x)
+
+icp_summary %>% 
+ filter(extraction_sequence != "DTPA") %>% 
+  filter(group == "CMMs and metals") %>% 
+  ggplot(aes(x = extraction_sequence, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "CMMs and metals",
+              y = "analyte concentration (μg/g soil)")+
+  facet_nested_wrap(~analyte + CRESS_ID, 
+                    scales = "free_y"
+                    )+
+#        scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+icp_summary %>% 
+ filter(extraction_sequence != "DTPA") %>% 
+  filter(group == "REEs") %>% 
+  ggplot(aes(x = extraction_sequence, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(title = "REEs",
+              y = "analyte concentration (μg/g soil)")+
+  facet_nested_wrap(~analyte + CRESS_ID, 
+                    scales = "free_y"
+                    )+
+#        scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+```{r}
+
+icp_qc = 
+  icp_processed %>%
+  group_by(CRESS_ID, sample_name, extraction_sequence, group, analyte) %>% 
+  dplyr::summarise(total_ugg = mean(total_ugg)) %>% 
+  pivot_wider(names_from = "extraction_sequence", values_from = "total_ugg") %>% 
+  mutate_if(where(is.numeric), round, 2) %>% 
+  mutate(ALL_EQUAL = case_when((`AMD Sequence` == `Soil Sequence`) &(`Soil Sequence` == `Tessier Sequence`) ~ "Y", .default = "N"))
+  
+  
+
+
+
+```
+
