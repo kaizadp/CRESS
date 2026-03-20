@@ -100,7 +100,11 @@ The "residual fraction" was calculated by subtracting total extractable values (
 
 icp_summary = 
   icp_processed %>% 
+  # keep only the analytes of interest
   filter(analyte %in% analytes_of_interest) %>% 
+  # Sc and Sr in CRESS_Mud1 were suspect. so drop them
+#  filter(!(CRESS_ID == "CRESS_Mud1" & (analyte == "Sc" | analyte == "Sr"))) %>% 
+  filter(!(CRESS_ID == "CRESS_Mud1")) %>% 
   group_by(CRESS_ID, sample_name, extraction_sequence, fraction, group, analyte) %>% 
   dplyr::summarise(ugg = mean(ug_g),
                    ugg_se = sd(ug_g)/sqrt(n()),
@@ -113,6 +117,8 @@ icp_summary =
 
 ### DTPA extraction (single point extraction)
 
+This is the bioavailable fraction
+
 ```{r dtpa, fig.height=7, fig.width=10}
 
 icp_summary %>% 
@@ -124,6 +130,10 @@ icp_summary %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
+- Sc and Cr were not measured for soil extracts (because the necessary standard was not available)
+- Li was below detection for all
+
 
 ### Sequential extraction (soil sequence)
 
@@ -140,6 +150,8 @@ icp_summary %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
+- Sc and Cr were not measured for soil extracts (because the necessary standard was not available)
 
 
 ### Sequential extraction (AMD sequence)
@@ -232,6 +244,19 @@ icp_summary %>%
 
 ```{r fig.height=10, fig.width=14}
 
+xrf_processed %>% 
+  ggplot(aes(x = CRESS_ID, y = XRF_ugg))+
+  geom_point()+
+  facet_wrap(~analyte, ncol = 4, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Comparing XRF data with digests
+
+```{r fig.height=10, fig.width=14}
+
 xrf_digest_compar = 
   xrf_processed %>% 
   full_join(icp_digests %>% dplyr::select(CRESS_ID, analyte, ug_g)) %>% 
@@ -247,7 +272,6 @@ xrf_digest_compar %>%
   facet_wrap(~analyte, scales = "free")
 
 ```
-
 
 
 ---
@@ -283,3 +307,19 @@ icp_summary %>%
 # Sc, Sr: Mud 1
 
 ```
+
+
+---
+
+## Session Info 
+
+<details>
+  <summary> Session Info </summary>
+
+Date run: `r Sys.Date()`
+
+```{r}
+sessionInfo()
+```
+
+</details>
