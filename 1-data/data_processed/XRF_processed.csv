@@ -23,8 +23,6 @@
 "CRESS_Soil1","La",0
 "CRESS_Soil1","Ce",0
 "CRESS_Soil1","Pb",64.5
-"CRESS_Soil1","Th",18.8
-"CRESS_Soil1","U",0
 "CRESS_Soil2","Cl",120
 "CRESS_Soil2","V",220
 "CRESS_Soil2","Cr",0
@@ -49,8 +47,6 @@
 "CRESS_Soil2","La",0
 "CRESS_Soil2","Ce",0
 "CRESS_Soil2","Pb",34.8
-"CRESS_Soil2","Th",0
-"CRESS_Soil2","U",0
 "CRESS_Soil3","Cl",74.3
 "CRESS_Soil3","V",417
 "CRESS_Soil3","Cr",102
@@ -75,8 +71,6 @@
 "CRESS_Soil3","La",0
 "CRESS_Soil3","Ce",0
 "CRESS_Soil3","Pb",58.3
-"CRESS_Soil3","Th",28.3
-"CRESS_Soil3","U",0
 "CRESS_Soil4","Cl",130
 "CRESS_Soil4","V",309
 "CRESS_Soil4","Cr",112
@@ -101,8 +95,6 @@
 "CRESS_Soil4","La",0
 "CRESS_Soil4","Ce",0
 "CRESS_Soil4","Pb",45.6
-"CRESS_Soil4","Th",42.6
-"CRESS_Soil4","U",0
 "CRESS_Soil5","Cl",84.6
 "CRESS_Soil5","V",519
 "CRESS_Soil5","Cr",302
@@ -127,8 +119,6 @@
 "CRESS_Soil5","La",0
 "CRESS_Soil5","Ce",0
 "CRESS_Soil5","Pb",33.3
-"CRESS_Soil5","Th",26
-"CRESS_Soil5","U",0
 "CRESS_Soil6","Cl",86.2
 "CRESS_Soil6","V",298
 "CRESS_Soil6","Cr",61.3
@@ -153,8 +143,6 @@
 "CRESS_Soil6","La",0
 "CRESS_Soil6","Ce",0
 "CRESS_Soil6","Pb",77.8
-"CRESS_Soil6","Th",27.2
-"CRESS_Soil6","U",0
 "CRESS_Soil7","Cl",64.4
 "CRESS_Soil7","V",171
 "CRESS_Soil7","Cr",25.4
@@ -179,8 +167,6 @@
 "CRESS_Soil7","La",0
 "CRESS_Soil7","Ce",0
 "CRESS_Soil7","Pb",53.8
-"CRESS_Soil7","Th",26.2
-"CRESS_Soil7","U",0
 "CRESS_Mud1","Cl",1205
 "CRESS_Mud1","V",2555
 "CRESS_Mud1","Cr",1090
@@ -205,8 +191,6 @@
 "CRESS_Mud1","La",353
 "CRESS_Mud1","Ce",321
 "CRESS_Mud1","Pb",125
-"CRESS_Mud1","Th",204
-"CRESS_Mud1","U",0
 "CRESS_Mud2","Cl",242
 "CRESS_Mud2","V",2980
 "CRESS_Mud2","Cr",2470
@@ -231,8 +215,6 @@
 "CRESS_Mud2","La",1170
 "CRESS_Mud2","Ce",1080
 "CRESS_Mud2","Pb",415
-"CRESS_Mud2","Th",309
-"CRESS_Mud2","U",0
 "CRESS_Mud3","Cl",125
 "CRESS_Mud3","V",3080
 "CRESS_Mud3","Cr",2450
@@ -257,5 +239,3 @@
 "CRESS_Mud3","La",1220
 "CRESS_Mud3","Ce",1140
 "CRESS_Mud3","Pb",435
-"CRESS_Mud3","Th",329
-"CRESS_Mud3","U",0
