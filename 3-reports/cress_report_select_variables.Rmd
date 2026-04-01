@@ -35,7 +35,7 @@ icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
 icp_digests = read.csv("1-data/data_processed/ICP_processed_digests.csv")
 xrf_processed = read.csv("1-data/data_processed/XRF_processed.csv")
 
-analytes_of_interest = c("Co", "Cr", "Cu", "Fe", "Li", "Ni", "Sc", "Sr", "Zn")
+analytes_of_interest = c("Al", "Co", "Cr", "Cu", "Fe", "Li", "Mn", "Ni", "Sc", "Sr", "Zn")
 analytes_list = read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/edit?gid=0#gid=0")
 
 ```
@@ -68,6 +68,7 @@ analytes_list = read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9lj
   filter(analyte %in% analytes_of_interest)
 
 analytes_list %>%  
+  dplyr::select(analyte, XRF, ICP) %>% 
   knitr::kable()
 
 ```
@@ -105,6 +106,7 @@ icp_summary =
   # Sc and Sr in CRESS_Mud1 were suspect. so drop them
 #  filter(!(CRESS_ID == "CRESS_Mud1" & (analyte == "Sc" | analyte == "Sr"))) %>% 
   filter(!(CRESS_ID == "CRESS_Mud1")) %>% 
+  mutate(CRESS_ID = str_remove(CRESS_ID, "CRESS_")) %>% 
   group_by(CRESS_ID, sample_name, extraction_sequence, fraction, group, analyte) %>% 
   dplyr::summarise(ugg = mean(ug_g),
                    ugg_se = sd(ug_g)/sqrt(n()),
@@ -119,7 +121,7 @@ icp_summary =
 
 This is the bioavailable fraction
 
-```{r dtpa, fig.height=7, fig.width=10}
+```{r dtpa, fig.height=7, fig.width=12}
 
 icp_summary %>% 
   filter(fraction == "A: DTPA-available") %>% 
@@ -137,7 +139,7 @@ icp_summary %>%
 
 ### Sequential extraction (soil sequence)
 
-```{r soil_sequence, fig.height=7, fig.width=10}
+```{r soil_sequence, fig.height=7, fig.width=12}
 
 icp_summary %>% 
   filter(extraction_sequence == "Soil Sequence") %>% 
@@ -156,7 +158,7 @@ icp_summary %>%
 
 ### Sequential extraction (AMD sequence)
 
-```{r amd_sequence, fig.height=7, fig.width=10}
+```{r amd_sequence, fig.height=7, fig.width=12}
 icp_summary %>% 
   filter(extraction_sequence == "AMD Sequence") %>% 
   ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
@@ -172,7 +174,7 @@ icp_summary %>%
 
 ### Sequential extraction (Tessier sequence)
 
-```{r tessier_sequence, fig.height=7, fig.width=10}
+```{r tessier_sequence, fig.height=7, fig.width=12}
 icp_summary %>% 
   filter(extraction_sequence == "Tessier Sequence") %>% 
   ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
@@ -194,7 +196,7 @@ icp_summary %>%
 
 ### Sequential extraction (soil sequence)
 
-```{r percent_soil_sequence, fig.height=7, fig.width=10}
+```{r percent_soil_sequence, fig.height=7, fig.width=12}
 icp_summary %>% 
   filter(extraction_sequence == "Soil Sequence") %>% 
   ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
@@ -209,7 +211,7 @@ icp_summary %>%
 
 ### Sequential extraction (AMD sequence)
 
-```{r percent_amd_sequence, fig.height=7, fig.width=10}
+```{r percent_amd_sequence, fig.height=7, fig.width=12}
 
 icp_summary %>% 
   filter(extraction_sequence == "AMD Sequence") %>% 
@@ -225,7 +227,7 @@ icp_summary %>%
 
 ### Sequential extraction (Tessier sequence)
 
-```{r percent_tessier_sequence, fig.height=7, fig.width=10}
+```{r percent_tessier_sequence, fig.height=7, fig.width=12}
 
 icp_summary %>% 
   filter(extraction_sequence == "Tessier Sequence") %>% 
@@ -255,7 +257,7 @@ xrf_processed %>%
 
 ## Comparing XRF data with digests
 
-```{r fig.height=10, fig.width=14}
+```{r fig.height=8, fig.width=14}
 
 xrf_digest_compar = 
   xrf_processed %>% 
@@ -267,8 +269,18 @@ xrf_digest_compar =
 
 xrf_digest_compar %>% 
   drop_na() %>% 
+  filter(analyte %in% analytes_of_interest) %>% 
   ggplot(aes(x = XRF_ugg, y = digest_ugg, color = CRESS_ID))+
-  geom_point(size = 2)+
+  geom_point(size = 3)+
+  geom_abline(slope = 1, linetype = "dashed", color = "grey50")+
+  facet_wrap(~analyte, scales = "free")
+
+xrf_digest_compar %>% 
+  drop_na() %>% 
+  filter(!analyte %in% analytes_of_interest) %>% 
+  ggplot(aes(x = XRF_ugg, y = digest_ugg, color = CRESS_ID))+
+  geom_point(size = 3)+
+  geom_abline(slope = 1, linetype = "dashed", color = "grey50")+
   facet_wrap(~analyte, scales = "free")
 
 ```

@@ -65,17 +65,19 @@ Full list of analytes
 
 Subset of analytes being discussed here
 
-| analyte | group           | XRF | ICP |
-|:--------|:----------------|:----|:----|
-| Co      | CMMs and metals |     | Y   |
-| Cr      | CMMs and metals | Y   | Y   |
-| Cu      | CMMs and metals | Y   | Y   |
-| Fe      | CMMs and metals |     | Y   |
-| Li      | CMMs and metals |     | Y   |
-| Ni      | CMMs and metals | Y   | Y   |
-| Sr      | CMMs and metals | Y   | Y   |
-| Zn      | CMMs and metals | Y   | Y   |
-| Sc      | REEs            |     | Y   |
+| analyte | XRF | ICP |
+|:--------|:----|:----|
+| Al      |     | Y   |
+| Co      |     | Y   |
+| Cr      | Y   | Y   |
+| Cu      | Y   | Y   |
+| Fe      |     | Y   |
+| Li      |     | Y   |
+| Mn      |     | Y   |
+| Ni      | Y   | Y   |
+| Sr      | Y   | Y   |
+| Zn      | Y   | Y   |
+| Sc      |     | Y   |
 
 ------------------------------------------------------------------------
 
@@ -148,7 +150,7 @@ This is the bioavailable fraction
 
 ## Comparing XRF data with digests
 
-![](cress_report_select_variables_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](cress_report_select_variables_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->![](cress_report_select_variables_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -161,7 +163,7 @@ This is the bioavailable fraction
 Session Info
 </summary>
 
-Date run: 2026-03-20
+Date run: 2026-03-31
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20
