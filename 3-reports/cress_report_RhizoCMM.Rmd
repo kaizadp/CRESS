@@ -1,0 +1,369 @@
+---
+title: "CRESS report for sequential extractions"
+output: 
+  github_document:
+  html_preview: true
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+options(knitr.kable.NA = "")
+
+```
+
+```{r packages}
+
+library(tidyverse)
+library(googlesheets4)
+library(whistledown)
+
+theme_set(theme_bw())
+options(scipen = 9999)
+
+pal_soil_sequence = whistledown::whistledown_palette("kathani", 5)
+pal_amd_sequence = whistledown::whistledown_palette("featherington", 7)
+pal_tessier_sequence = whistledown::whistledown_palette("queen", 6)
+
+theme_kp <- function() {  # this for all the elements common across plots
+  theme_bw() %+replace%
+    theme(legend.position = "right",
+          legend.key=element_blank(),
+          legend.title = element_text(size = 14, hjust = 0),
+          legend.text = element_text(size = 12),
+          legend.key.size = unit(1.5, 'lines'),
+          legend.background = element_rect(colour = NA),
+          panel.border = element_rect(color="black",linewidth=1, fill = NA),
+          
+          plot.title = element_text(hjust = 0, size = 14),
+          axis.text = element_text(size = 14, color = "black"),
+          axis.title = element_text(size = 14, face = "bold", color = "black"),
+          
+          # formatting for facets
+          panel.background = element_blank(),
+          strip.background = element_rect(colour="white", fill="white"), #facet formatting
+          panel.spacing.x = unit(1, "lines"), #facet spacing for x axis
+          panel.spacing.y = unit(1.5, "lines"), #facet spacing for x axis
+          strip.text.x = element_text(size=14, face="bold"), #facet labels
+          strip.text.y = element_text(size=14, face="bold", angle = 270) #facet labels
+    )
+}
+theme_set(theme_kp())
+
+
+```
+
+```{r load_files}
+
+icp_processed = read.csv("1-data/data_processed/ICP_processed.csv")
+icp_digests = read.csv("1-data/data_processed/ICP_processed_digests.csv")
+xrf_processed = read.csv("1-data/data_processed/XRF_processed.csv")
+
+analytes_of_interest = c("Al", "Co", "Cu", "Fe", "Li", "Mn", "Ni", "Sr", "Zn")
+analytes_list = read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/edit?gid=0#gid=0")
+
+```
+
+
+--- 
+
+# Experimental design
+
+<details>
+<summary> Click to open </summary>
+
+## Which analytes were measured?
+
+Full list of analytes
+
+```{r}
+
+analytes_list %>%  
+  knitr::kable()
+
+```
+
+
+Subset of analytes being discussed here
+
+```{r}
+
+analytes_list = read_sheet("https://docs.google.com/spreadsheets/d/1KVmtSHtLs9ljyzNVzbpEQ-GWavy0_Bpi-gCd8MOw6uc/edit?gid=0#gid=0") %>% 
+  filter(analyte %in% analytes_of_interest)
+
+analytes_list %>%  
+  dplyr::select(analyte, XRF, ICP) %>% 
+  knitr::kable()
+
+```
+
+
+--- 
+
+
+## Extractions performed:
+
+- Single-point DTPA extraction
+- "Soil sequence" sequential extraction: water --> HCl --> sodium dithionite --> sodium pyrophosphate
+- "AMD sequence" (Acid Mine Drainage) sequential extraction
+- "Tessier sequence" sequential extraction
+
+Microwave digestions were performed to quantify total concentrations in the samples. 
+The "residual fraction" was calculated by subtracting total extractable values (from the sequences) from the digest concentrations.
+
+
+
+</details>
+
+
+
+---
+
+## ICP-MS results -- ug/g
+
+```{r icp_files}
+
+icp_summary = 
+  icp_processed %>% 
+  # keep only the analytes of interest
+  filter(analyte %in% analytes_of_interest) %>% 
+  # Sc and Sr in CRESS_Mud1 were suspect. so drop them
+  filter(!(CRESS_ID == "CRESS_Mud1")) %>% 
+  filter(!(CRESS_ID == "CRESS_Soil1")) %>% 
+  # keep only soil samples
+  filter(grepl("Soil", CRESS_ID)) %>% 
+  mutate(CRESS_ID = str_remove(CRESS_ID, "CRESS_")) %>% 
+  group_by(CRESS_ID, sample_name, extraction_sequence, fraction, group, analyte) %>% 
+  dplyr::summarise(ugg = mean(ug_g),
+                   ugg_se = sd(ug_g)/sqrt(n()),
+                   mgg = ugg/1000,
+                   percent = mean(percent)) %>% 
+  mutate(across(where(is.numeric), round, 2))
+
+```
+
+
+### DTPA extraction (single point extraction)
+
+This is the bioavailable fraction
+
+```{r dtpa, fig.height=9, fig.width=12}
+
+icp_summary %>% 
+  filter(fraction == "A: DTPA-available") %>% 
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+- Sc and Cr were not measured for soil extracts (because the necessary standard was not available)
+- Li was below detection for all
+
+
+### Sequential extraction (soil sequence)
+
+```{r soil_sequence, fig.height=9, fig.width=12}
+
+icp_summary %>% 
+  filter(extraction_sequence == "Soil Sequence") %>% 
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  scale_fill_manual(values = pal_soil_sequence)+ 
+  scale_y_continuous(labels = scales::comma)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+- Sc and Cr were not measured for soil extracts (because the necessary standard was not available)
+
+
+### Sequential extraction (AMD sequence)
+
+```{r amd_sequence, fig.height=9, fig.width=12}
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  scale_fill_manual(values = pal_amd_sequence)+ 
+  scale_y_continuous(labels = scales::comma)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (Tessier sequence)
+
+```{r tessier_sequence, fig.height=9, fig.width=12}
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  scale_fill_manual(values = pal_tessier_sequence)+ 
+  scale_y_continuous(labels = scales::comma)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+---
+
+
+---
+
+## ICP-MS results -- percentage
+
+### Sequential extraction (soil sequence)
+
+```{r percent_soil_sequence, fig.height=9, fig.width=12}
+icp_summary %>% 
+  filter(extraction_sequence == "Soil Sequence") %>% 
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "percentage",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  scale_fill_manual(values = pal_soil_sequence)+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (AMD sequence)
+
+```{r percent_amd_sequence, fig.height=9, fig.width=12}
+
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "percentage",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  scale_fill_manual(values = pal_amd_sequence)+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+### Sequential extraction (Tessier sequence)
+
+```{r percent_tessier_sequence, fig.height=9, fig.width=12}
+
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+  ggplot(aes(x = CRESS_ID, y = percent, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "percentage",
+       x = "")+
+  facet_wrap(~analyte, scales = "free_y")+
+  scale_fill_manual(values = pal_tessier_sequence)+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+---
+
+# XRF analysis
+
+```{r fig.height=10, fig.width=14}
+
+xrf_processed %>% 
+  ggplot(aes(x = CRESS_ID, y = XRF_ugg))+
+  geom_point()+
+  facet_wrap(~analyte, ncol = 4, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Comparing XRF data with digests
+
+```{r fig.height=8, fig.width=10}
+
+xrf_digest_compar = 
+  xrf_processed %>% 
+  full_join(icp_digests %>% dplyr::select(CRESS_ID, analyte, ug_g)) %>% 
+  rename(digest_ugg = ug_g) %>% 
+  arrange(analyte) %>% 
+  filter(grepl("Soil", CRESS_ID)) %>% 
+#  pivot_longer(cols = -c(CRESS_ID, analyte)) %>% 
+  force()
+
+xrf_digest_compar %>% 
+  drop_na() %>% 
+  filter(analyte %in% analytes_of_interest) %>% 
+  ggplot(aes(x = XRF_ugg, y = digest_ugg, color = CRESS_ID))+
+  geom_point(size = 4, show.legend = F)+
+  geom_abline(slope = 1, linetype = "dashed", color = "grey50")+
+  expand_limits(y = 0)+
+  expand_limits(x = 0)+
+  labs(x = "XRF results (μg/g)",
+       y = "Digestion results (μg/g)")+
+  facet_wrap(~analyte, scales = "free")
+
+```
+
+
+---
+
+```{r, eval=FALSE}
+library(ggh4x)
+
+icp_summary %>% 
+  filter(extraction_sequence != "DTPA") %>% 
+  ggplot(aes(x = extraction_sequence, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)")+
+  facet_nested_wrap(~analyte + CRESS_ID, 
+                    scales = "free_y"
+                    )+
+#        scale_fill_manual(values = pal_tessier_sequence)+ 
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+icp_summary %>% 
+  filter(extraction_sequence != "DTPA") %>% 
+  ggplot(aes(x = extraction_sequence, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)")+
+  facet_grid(analyte ~ CRESS_ID, scales = "free_y")+
+  scale_y_continuous(labels = scales::comma)+
+  scale_fill_manual(values = whistledown_palette("queen", 15))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# Li: Mud1
+# Sc, Sr: Mud 1
+
+```
+
+
+---
+
+## Session Info 
+
+<details>
+  <summary> Session Info </summary>
+
+Date run: `r Sys.Date()`
+
+```{r}
+sessionInfo()
+```
+
+</details>
