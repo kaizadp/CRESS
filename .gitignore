@@ -49,3 +49,6 @@ po/*~
 rsconnect/
 
 .DS_Store
+
+# large files
+1-data/FTICR_Kew/ProcData.zip
