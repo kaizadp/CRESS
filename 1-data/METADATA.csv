@@ -1,0 +1,8 @@
+CRESS_ID,Proposal_ID,Sampling_Set,lat_lon,geo_loc_name,soil_type,cur_vegetation,ecoregion,cur_land_use
+CRESS_Soil4,61798,1,"32.559866, -110.839043","United States: Arizona, Oro Valley",Entisol,Desert Shrub,Desert Southwest,rangeland
+CRESS_Soil5,61803,4,"64.8748, -147.8317","United States: Alaska, Fairbanks",Inceptisol,"horsetail, moss, birch, white spruce",Taiga,intermixed
+CRESS_Soil3,61875,3,"40.7252, -81.7528","United States: Ohio, Apple Creek",Alfisol,Corn-Soybean,Great Lakes,row crops
+CRESS_Soil6,62049,1,"37.986942, -87.509522","United States: Indiana, Evansville",Inceptisol,"Mixed hardwood - american elm, sugar maple, white oak, tulip poplar, spice bush, shingle oak, pawpaw",Appalachians / Cumberland Plateau,hardwoods
+CRESS_Soil7,61049,51,"31.911559, -110.835938","United States: Arizona, Sahuarita",Entisol,Creosote shrubland,Desert Southwest,shrub land
+CRESS_Soil2,61049,53,"37.11077, -119.73658","United States: California, O'Neals",Alfisol,Oak Savannah,Pacific Southwest,rangeland
+CRESS_Soil1,GCW,A,"38.874445, -76.551667","United States: Maryland, Edgewater",Ultisol,Mixed hardwood,Mid Atlantic,hardwoods
