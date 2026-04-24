@@ -554,12 +554,12 @@ for ax, sample in zip(axes, sample_order):
 
     ax.scatter(
         h2o_only["O/C"], h2o_only["H/C"],
-        s=12, c="#e68613", alpha=0.75, linewidths=0
+        s=12, c="#2b83ba", alpha=0.75, linewidths=0
     )
 
     ax.scatter(
         hcl_only["O/C"], hcl_only["H/C"],
-        s=12, c="#2b83ba", alpha=0.75, linewidths=0
+        s=12, c="#e68613", alpha=0.75, linewidths=0
     )
 
     ax.set_title(sample, fontsize=11)
@@ -579,9 +579,9 @@ legend_handles = [
     Line2D([0], [0], marker='o', color='w', label='All consensus features',
            markerfacecolor='lightgray', markersize=7, alpha=0.8),
     Line2D([0], [0], marker='o', color='w', label='H2O only',
-           markerfacecolor="#e68613", markersize=7, alpha=0.9),
-    Line2D([0], [0], marker='o', color='w', label='0.5M HCl only',
            markerfacecolor="#2b83ba", markersize=7, alpha=0.9),
+    Line2D([0], [0], marker='o', color='w', label='0.5M HCl only',
+           markerfacecolor="#e68613", markersize=7, alpha=0.9),
 ]
 
 fig.legend(handles=legend_handles, loc="upper right", frameon=True)
