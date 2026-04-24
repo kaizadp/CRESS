@@ -1,0 +1,28 @@
+2026-03-06 09:35:18,979 - ERROR - Failed to process 20260126_NaTFA_Pre_1tr_000001.d: You don't have any chromatography-data.sqlite file in the  E:\ICR_Data\62037_Kaizad\RawData\20260126_NaTFA_Pre_1tr_000001.d folder, please double check the path
+Traceback (most recent call last):
+  File "C:\CoreMS\shared_scripts\62037_Kaizad_CoreMS_Processing_20260306.py", line 746, in process_datafile
+    result = get_readbacks(bruker_reader, result)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\CoreMS\shared_scripts\62037_Kaizad_CoreMS_Processing_20260306.py", line 703, in get_readbacks
+    sqlite_data = bruker_reader.parse_sqlite()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PythonEnvs\CoreMS311\Lib\site-packages\corems\transient\input\brukerSolarix.py", line 438, in parse_sqlite
+    sqlite_filelocation = self.locate_file(
+                          ^^^^^^^^^^^^^^^^^
+  File "D:\PythonEnvs\CoreMS311\Lib\site-packages\corems\transient\input\brukerSolarix.py", line 295, in locate_file
+    raise Exception(
+Exception: You don't have any chromatography-data.sqlite file in the  E:\ICR_Data\62037_Kaizad\RawData\20260126_NaTFA_Pre_1tr_000001.d folder, please double check the path
+2026-03-06 09:35:18,981 - ERROR - Failed to process 20260126_NaTFA_Pst_1tr_000001.d: You don't have any chromatography-data.sqlite file in the  E:\ICR_Data\62037_Kaizad\RawData\20260126_NaTFA_Pst_1tr_000001.d folder, please double check the path
+Traceback (most recent call last):
+  File "C:\CoreMS\shared_scripts\62037_Kaizad_CoreMS_Processing_20260306.py", line 746, in process_datafile
+    result = get_readbacks(bruker_reader, result)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\CoreMS\shared_scripts\62037_Kaizad_CoreMS_Processing_20260306.py", line 703, in get_readbacks
+    sqlite_data = bruker_reader.parse_sqlite()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PythonEnvs\CoreMS311\Lib\site-packages\corems\transient\input\brukerSolarix.py", line 438, in parse_sqlite
+    sqlite_filelocation = self.locate_file(
+                          ^^^^^^^^^^^^^^^^^
+  File "D:\PythonEnvs\CoreMS311\Lib\site-packages\corems\transient\input\brukerSolarix.py", line 295, in locate_file
+    raise Exception(
+Exception: You don't have any chromatography-data.sqlite file in the  E:\ICR_Data\62037_Kaizad\RawData\20260126_NaTFA_Pst_1tr_000001.d folder, please double check the path
