@@ -321,6 +321,181 @@ icp_summary %>%
 ```
 
 
+--- 
+
+## sample info
+
+```{r}
+
+import_metadata = function(FILEPATH, PATTERN){
+  
+  filePaths <- list.files(path = FILEPATH, pattern = PATTERN, full.names = TRUE)
+  dat <- do.call(bind_rows, lapply(filePaths, function(path) {
+    df <- read_csv(path) %>% mutate_all(as.character)
+    df}))
+}
+metadata = read.csv("1-data/METADATA.csv")
+
+
+```
+
+
+
+
+```{r map_data}
+library(sf) # for map
+
+
+neonDomains <- read_sf("NEONDomains_2024", layer="NEON_Domains")
+#neonMercator <- st_transform(neonDomains, crs="+proj=merc")
+
+## create a df with site coordinates and labels
+sites = metadata %>% 
+  separate(lat_lon, sep = ",", into = c("lat", "lon"), remove = F) %>% 
+  dplyr::select(CRESS_ID, lat, lon) %>% 
+  mutate(lat = parse_number(lat),
+         lon = parse_number(lon))
+
+```
+
+```{r map_plot}
+
+baseplot =   
+  ggplot() + 
+  geom_sf(data = neonDomains, color = "grey30", linewidth = 0.5,
+          aes(fill = domainName), show.legend = F, alpha = 0.5,
+          fill = NA) + 
+#  geom_sf_text(data = neonDomains, color = "black", aes(label = domainID), fill = NA)+
+  geom_text(data = sites, color = "black", aes(lon, lat, label = CRESS_ID), fill = NA, size = 4, position = position_nudge(x = 1, y = 1))+
+  theme(legend.background = element_rect(fill = alpha("white", 0.0)), 
+        legend.key = element_rect(fill = "transparent"), 
+        legend.position = c(0.85, 0.1),
+        axis.text = element_blank()) + 
+  geom_point(data = sites, 
+             aes(lon, lat),
+             size = 4, color = "black")+
+  cowplot::theme_map() + 
+  labs(x = "", y = "")+
+  scale_fill_manual(values = pnw_palette("Bay", 20))+
+  #scale_fill_manual(values = whistledown_palette("featherington", 20))+
+  scale_fill_manual(values = microViz::distinct_palette(n = 20, pal = "kelly"))+
+  NULL   
+
+usa = 
+  baseplot + 
+  coord_sf(xlim = c(-130, -65), ylim = c(19, 50), expand = F)+
+  NULL  
+
+ak = 
+  baseplot +
+  coord_sf(xlim = c(-180, -120), ylim = c(50, 75), expand = F)+
+  NULL  
+
+hi = 
+  baseplot + 
+  coord_sf(xlim = c(-162, -152), ylim = c(18, 23), expand = F)+
+  NULL  
+
+#gg_map = 
+  usa + 
+  annotation_custom(
+    ggplotGrob(ak), 
+    xmin = -130, xmax = -110, ymin = 10, ymax = 40)+
+  annotation_custom(
+    ggplotGrob(hi), 
+    xmin = -115, xmax = -100, ymin = 12, ymax = 32)+
+  theme_kp()
+
+```
+
+
+---
+
+## ICP-MS for Red Mud Only
+
+### DTPA extraction (single point extraction)
+
+This is the bioavailable fraction
+
+```{r dtpa, fig.height=7, fig.width=12}
+
+icp_summary %>% 
+  filter(fraction == "A: DTPA-available") %>% 
+  filter(grepl("Mud", CRESS_ID)) %>% 
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y", nrow = 1)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_blank())
+
+```
+
+- Sc and Cr were not measured for soil extracts (because the necessary standard was not available)
+- Li was below detection for all
+
+
+### Sequential extraction (soil sequence)
+
+```{r soil_sequence, fig.height=7, fig.width=12}
+
+icp_summary %>% 
+  filter(extraction_sequence == "Soil Sequence") %>% 
+    filter(grepl("Mud", CRESS_ID)) %>% 
+  ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y", nrow = 1)+
+  scale_fill_manual(values = pal_soil_sequence)+ 
+  scale_y_continuous(labels = scales::comma)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_blank())
+```
+
+- Sc and Cr were not measured for soil extracts (because the necessary standard was not available)
+
+
+### Sequential extraction (AMD sequence)
+
+```{r amd_sequence, fig.height=7, fig.width=12}
+icp_summary %>% 
+  filter(extraction_sequence == "AMD Sequence") %>% 
+      filter(grepl("Mud", CRESS_ID)) %>% 
+ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y", nrow = 1)+
+  scale_fill_manual(values = pal_amd_sequence)+ 
+  scale_y_continuous(labels = scales::comma)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_blank())
+```
+
+
+### Sequential extraction (Tessier sequence)
+
+```{r tessier_sequence, fig.height=7, fig.width=12}
+icp_summary %>% 
+  filter(extraction_sequence == "Tessier Sequence") %>% 
+        filter(grepl("Mud", CRESS_ID)) %>% 
+ggplot(aes(x = CRESS_ID, y = ugg, fill = fraction))+
+  geom_bar(stat = "identity")+
+  labs(y = "analyte concentration (μg/g soil)")+
+  facet_wrap(~analyte, scales = "free_y", nrow = 1)+
+  scale_fill_manual(values = pal_tessier_sequence)+ 
+  scale_y_continuous(labels = scales::comma)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_blank())
+```
+
+---
+
+
+
+
+
+
+
 ---
 
 ## Session Info 
